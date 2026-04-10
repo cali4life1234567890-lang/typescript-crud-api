@@ -31,60 +31,72 @@
    public firstName!: string;
    public lastName!: string;
     public role!: string;
-public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
-  }
+   public readonly createdAt!: Date;      // ✅ ADD THIS
+   public readonly updatedAt!: Date;      // ✅ ADD THIS
+ }
 
-  export default function userModel(sequelize: Sequelize) {
-    User.init(
-      {
-        id: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          primaryKey: true,
-        },
-        email: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          unique: true,
-        },
-        passwordHash: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        title: {
-          type: DataTypes.STRING,
-          allowNull: true,
-        },
-        firstName: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        lastName: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        role: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          defaultValue: 'user',
-        },
-        createdAt: {
-          type: DataTypes.DATE,
-          allowNull: false,
-          defaultValue: DataTypes.NOW,
-        },
-        updatedAt: {
-          type: DataTypes.DATE,
-          allowNull: false,
-          defaultValue: DataTypes.NOW,
-        },
+
+ // Export the model initializer function
+  export default function (sequelize: Sequelize): typeof User {
+      User.init(
+          {
+              id: {
+                  type: DataTypes.INTEGER,
+                  autoIncrement: true,
+                  primaryKey: true,
+              },
+              email: {
+                  type: DataTypes.STRING,
+                  allowNull: false,
+                  unique: true,
+              },
+              passwordHash: {
+                  type: DataTypes.STRING,
+                  allowNull: false,
+              },
+              title: {
+                  type: DataTypes.STRING,
+                  allowNull: false,
+              },
+              firstName: {
+                  type: DataTypes.STRING,
+                  allowNull: false,
+              },
+              lastName: {
+                  type: DataTypes.STRING,
+                  allowNull: false,
+              },
+              role: {
+                  type: DataTypes.STRING,
+                  allowNull: false,
+              },
+            
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    sequelize,
+    modelName: 'User',
+    tableName: 'users',
+    timestamps: true, // ✅ Ensure this is true (default)
+    defaultScope: {
+      attributes: { exclude: ['passwordHash'] },
+    },
+    scopes: {
+      withHash: {
+        attributes: { include: ['passwordHash'] },
       },
-      {
-        sequelize,
-        modelName: 'User',
-        tableName: 'users',
-      }
-    );
-    return User;
+    },
   }
+);
+
+return User;
+}

@@ -1,26 +1,31 @@
+// src/_helpers/db.ts
 import config from '../../config.json';
 import mysql from 'mysql2/promise';
 import { Sequelize } from 'sequelize';
-import userModel from '../users/user.model';
 
-export interface Database {
-  User: any;
-}
+  export interface Database {
+    User: any; // We'll type this properly after creating the model
+  }
 
-export const db: Database = {} as Database;
+  export const db: Database = {} as Database;
 
-export async function initialize(): Promise<void> {
-  const { host, port, user, password, database } = config.database;
+  export async function initialize(): Promise<void> {
+    const { host, port, user, password, database } = config.database;
 
-  const connection = await mysql.createConnection({ host, port, user, password });
-  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
-  await connection.end();
+    // Create database if it doesn't exist
+    const connection = await mysql.createConnection({ host, port, user, password });
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
+    await connection.end();
 
-  const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
+    // Connect to database with Sequelize
+    const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
 
-  db.User = userModel(sequelize);
+    // Initialize models
+    const { default: userModel } = await import('../users/user.model');
+    db.User = userModel(sequelize);
 
-  await sequelize.sync({ alter: true });
+    // Sync models with database
+    await sequelize.sync({ alter: true });
 
-  console.log('✅ Database initialized and models synced');
-}
+    console.log('✅ Database initialized and models synced');
+  }
