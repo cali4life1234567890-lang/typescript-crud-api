@@ -1,0 +1,90 @@
+// src/users/user.model.ts
+  import { DataTypes, Model, Optional } from 'sequelize';
+   import type { Sequelize } from 'sequelize';
+
+  // Define the attributes interface
+  export interface UserAttributes {
+    id: number;
+    email: string;
+     passwordHash: string;
+    title: string;
+   firstName: string;
+    lastName: string;
+    role: string;
+   createdAt: Date;          // ✅ ADD THIS
+   updatedAt: Date;          // ✅ ADD THIS
+ }
+
+  // Define optional attributes for creation
+  export interface UserCreationAttributes
+   extends Optional<UserAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+
+  // Define the Sequelize model class
+  export class User
+   extends Model<UserAttributes, UserCreationAttributes>
+   implements UserAttributes {
+
+   public id!: number;
+   public email!: string;
+   public passwordHash!: string;
+   public title!: string;
+   public firstName!: string;
+   public lastName!: string;
+    public role!: string;
+public readonly createdAt!: Date;
+    public readonly updatedAt!: Date;
+  }
+
+  export default function userModel(sequelize: Sequelize) {
+    User.init(
+      {
+        id: {
+          type: DataTypes.INTEGER,
+          autoIncrement: true,
+          primaryKey: true,
+        },
+        email: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true,
+        },
+        passwordHash: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        title: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        firstName: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        lastName: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        role: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          defaultValue: 'user',
+        },
+        createdAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+          defaultValue: DataTypes.NOW,
+        },
+        updatedAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+          defaultValue: DataTypes.NOW,
+        },
+      },
+      {
+        sequelize,
+        modelName: 'User',
+        tableName: 'users',
+      }
+    );
+    return User;
+  }
